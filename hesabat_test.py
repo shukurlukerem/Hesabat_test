@@ -71,7 +71,7 @@ def init_db():
 init_db()
 
 def get_db_connection():
-    conn = sqlite3.connect(MainDB)  
+    conn = sqlite3.connect(MainDB)
     conn.row_factory = sqlite3.Row       
     return conn
 
