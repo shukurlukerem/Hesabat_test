@@ -188,7 +188,7 @@ def fetch_user_details(username):
 def get_fakulte(fakulte_kodu):
     conn = get_db_connection()
     try:
-        sql = """SELECT kafedra_adi FROM Bolme_Novu_Kafedra WHERE fakulte_kodu =?"""  
+        sql = """SELECT kafedra_adi, kafedra_kodu FROM Bolme_Novu_Kafedra WHERE fakulte_kodu =?"""
         cursor = conn.cursor()
         cursor.execute(sql, fakulte_kodu)
         rows = cursor.fetchall()
@@ -198,6 +198,39 @@ def get_fakulte(fakulte_kodu):
         return jsonify({'error': str(e)}), 500
     finally:
         conn.close()
+    
+@app.route('/kafedra_muellimleri/<kafedra_kodu>', methods = ['GET'])
+@token_required
+def kadefra_mlm(kafedra_kodu):
+    conn = get_db_connection()
+    try:
+        query = "SELECT ad,soyad, ata_adi, vezife_adi, vezife_kodu, kafedra_adi FROM user_details WHERE kafedra_kodu = ?"
+        cursor = conn.cursor()
+        cursor.execute(query, (kafedra_kodu,))
+        rows = cursor.fetchall()
+        
+        results = [dict(row) for row in rows]  
+        return jsonify(results)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        conn.close()
+
+@app.route('/get_kafedra_name/<kafedra_kodu>', methods=['GET'])
+@token_required
+def get_kafedra_name(kafedra_kodu):
+    conn = get_db_connection()
+    try:
+        sql = """SELECT kafedra_adi FROM Bolme_Novu_Kafedra WHERE kafedra_kodu =?"""
+        cursor = conn.cursor()
+        cursor.execute(sql, (str(kafedra_kodu),))
+        rows = cursor.fetchall()
+        results = [dict(row) for row in rows]
+        return jsonify(results)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    finally:
+        conn.close()
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run( host="0.0.0.0", port=5001, debug=True )
